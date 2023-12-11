@@ -2,8 +2,9 @@ package org.example;
 
 import java.io.*;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -24,30 +25,23 @@ public class Main {
     );
     public static void main(String[] args) throws IOException {
         var list = new ArrayList<Integer>();
-
-        BufferedReader in = new BufferedReader(new FileReader("aoc_day1_input.txt"));
-
         Pattern patt = Pattern.compile("\\d");
-        List<Integer> nums = new ArrayList<>();
-        String str = "";
-        while((str = in.readLine())!=null) {
-            for (Map.Entry<String, String> entry: values.entrySet()){
-                str = str.replaceAll(entry.getKey(), entry.getValue());
-            }
-            Matcher matcher = patt.matcher(str);
-            String temp = "";
-            while (matcher.find()) {
-                String g = matcher.group();
-                temp = temp.concat(g);
-            }
-            Integer i = Integer.valueOf(String.valueOf(temp.charAt(0)).concat(String.valueOf(temp.charAt(temp.length() - 1))));
-            nums.add(i);
-        }
-        int sum = 0;
-        for(Integer n: nums) {
-            sum +=n;
-        }
+        List<Integer> nums = Files.lines(Path.of("aoc_day1_input.txt"))
+                .map(str->{
+                    for (Map.Entry<String, String> entry: values.entrySet()){
+                        str = str.replaceAll(entry.getKey(), entry.getValue());
+                    }
+                    Matcher matcher = patt.matcher(str);
+                    String temp ="";
+                    while (matcher.find()) {
+                        String g = matcher.group();
+                        temp = temp.concat(g);
+                    }
+                    Integer i = Integer.valueOf(String.valueOf(temp.charAt(0)).concat(String.valueOf(temp.charAt(temp.length() - 1))));
+                return i;
+                })
+                .collect(Collectors.toList());
+        int sum = nums.stream().mapToInt(Integer::intValue).sum();
         System.out.println(sum);
-
     }
 }
