@@ -21,7 +21,7 @@ public class Main {
         AtomicInteger score = new AtomicInteger(0);
 
         Map<String, String> games = new HashMap<>();
-        List<Integer> valList = new ArrayList<>();
+        List<Integer> maxList = new ArrayList<>();
         Pattern pattern = Pattern.compile("(\\d+)\\s+red| (\\d+)\\s+blue| (\\d+)\\s+green");
         int sum =  Files.lines(Path.of("aoc_day2_input.txt"))
                 .map( line -> {
@@ -31,11 +31,15 @@ public class Main {
                     String[] sets = temp[1].split(";");
                     int valAssign = 0;
                     boolean flag = false;
+                    int maxRed, maxBlue, maxGreen;
+                    maxRed=maxBlue=maxGreen=0;
+                    int totalRed =0, totalBlue=0, totalGreen =0;
+
                     for(String s: sets){
-                        int totalRed =0, totalBlue=0, totalGreen =0;
+                         totalRed =0; totalBlue=0; totalGreen =0;
                         Matcher matcher = pattern.matcher(s);
 
-                        while(matcher.find() && !flag) {
+                        while(matcher.find()) {
                             if (matcher.group(1) != null) {
                                 totalRed += Integer.parseInt(matcher.group(1));
                             }
@@ -46,25 +50,36 @@ public class Main {
                                 totalGreen += Integer.parseInt(matcher.group(3));
                             }
 
-                            if ( totalRed > red ||  totalBlue > blue || totalGreen > green) {
-                                flag = true;
+                            if (totalRed > maxRed) {
+                                maxRed = totalRed;
                             }
+                            if (totalBlue > maxBlue) {
+                                maxBlue = totalBlue;
+                            }
+                            if (totalGreen > maxGreen) {
+                                maxGreen = totalGreen;
+                            }
+
                             System.out.println(String.format("TR: %d  TB: %d TG: %d - %s flag", totalRed, totalBlue, totalGreen, flag));
+                            System.out.println(String.format("MaxR: %d  MaxB: %d MaxG: %d", maxRed, maxBlue, maxGreen));
+
                         }
                     }
+                    System.out.println(String.format("MaxR: %d  MaxB: %d MaxG: %d", maxRed, maxBlue, maxGreen));
 
+                    maxList.add(maxRed*maxBlue*maxGreen);
                     if(!flag){
                         valAssign=gamenum.get();
                     }
 
                     score.getAndAdd(valAssign);
-                    System.out.println("GAME: " +gamenum);
-                    System.out.println("Value: "+valAssign);
-                    System.out.println("Total Value thus far: "+score);
                     return valAssign;
                 }).mapToInt(Integer::intValue).sum();
-
+        int powerset = maxList.stream()
+                .mapToInt(Integer::intValue).sum();
         System.out.println(sum);
+        System.out.println(maxList);
+        System.out.println(powerset);
     }
 
     }
